@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RoCodesX — Owner Access</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #050812;
+    color: #e0eaff;
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(circle at 30% 40%, rgba(255,60,172,0.08) 0%, transparent 60%),
+      radial-gradient(circle at 70% 60%, rgba(0,245,255,0.06) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .card {
+    background: rgba(10,16,37,0.95);
+    border: 1px solid rgba(255,60,172,0.3);
+    border-radius: 20px;
+    padding: 48px 40px;
+    width: 100%; max-width: 420px;
+    text-align: center;
+    position: relative; overflow: hidden;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.6), 0 0 40px rgba(255,60,172,0.08);
+    animation: fadeIn 0.5s ease both;
+  }
+  .card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, #ff3cac, #ffb800, #00f5ff, #ff3cac);
+    background-size: 200% auto;
+    animation: shimmer 3s linear infinite;
+  }
+  @keyframes shimmer { to { background-position: 200% center; } }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+
+  .crown { font-size: 3.5rem; display: block; margin-bottom: 16px; animation: bob 2s ease-in-out infinite; }
+  @keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+  h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.3rem; font-weight: 900; letter-spacing: 2px;
+    background: linear-gradient(90deg, #ff3cac, #ffb800);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; margin-bottom: 8px;
+  }
+  .subtitle { color: #6a82b0; font-size: 0.9rem; margin-bottom: 32px; line-height: 1.5; }
+
+  .input-wrap { position: relative; margin-bottom: 16px; }
+  input[type="password"] {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1.5px solid rgba(255,60,172,0.25);
+    border-radius: 10px;
+    padding: 14px 50px 14px 18px;
+    color: #e0eaff;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1.1rem; font-weight: 600;
+    letter-spacing: 3px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    text-align: center;
+  }
+  input:focus {
+    border-color: #ff3cac;
+    box-shadow: 0 0 18px rgba(255,60,172,0.3);
+  }
+  .eye-btn {
+    position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: pointer; color: #6a82b0; font-size: 1.1rem;
+    transition: color 0.2s;
+  }
+  .eye-btn:hover { color: #ff3cac; }
+
+  .submit-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #ff3cac, #ffb800);
+    color: #000; font-family: 'Orbitron', sans-serif;
+    font-size: 0.8rem; font-weight: 900; letter-spacing: 2px;
+    padding: 14px; border: none; border-radius: 10px; cursor: pointer;
+    text-transform: uppercase;
+    transition: opacity 0.2s, box-shadow 0.2s, transform 0.15s;
+    margin-bottom: 16px;
+  }
+  .submit-btn:hover { opacity: 0.88; box-shadow: 0 6px 24px rgba(255,60,172,0.4); transform: translateY(-1px); }
+  .submit-btn:active { transform: translateY(0); }
+
+  .back-link {
+    color: #6a82b0; font-size: 0.82rem; text-decoration: none;
+    transition: color 0.2s;
+  }
+  .back-link:hover { color: #00f5ff; }
+
+  .msg {
+    padding: 10px 16px; border-radius: 8px;
+    font-size: 0.85rem; font-weight: 600; margin-bottom: 16px;
+    display: none;
+  }
+  .msg.success { background: rgba(0,255,128,0.1); border: 1px solid rgba(0,255,128,0.3); color: #00ff80; }
+  .msg.error   { background: rgba(255,60,60,0.1);  border: 1px solid rgba(255,60,60,0.3);  color: #ff6666; }
+  .msg.show    { display: block; }
+
+  .hint { color: #6a82b0; font-size: 0.75rem; margin-top: 20px; line-height: 1.5; }
+  .hint strong { color: #ffb800; }
+</style>
+</head>
+<body>
+<div class="card">
+  <span class="crown">👑</span>
+  <h1>Owner Access</h1>
+  <p class="subtitle">Enter the secret owner code to access admin controls and unlock all features.</p>
+
+  <div class="msg" id="msg"></div>
+
+  <div class="input-wrap">
+    <input type="password" id="codeInput" placeholder="Enter owner code…" maxlength="30"
+      onkeydown="if(event.key==='Enter') verify()">
+    <button class="eye-btn" onclick="toggleEye()" id="eyeBtn">👁</button>
+  </div>
+
+  <button class="submit-btn" onclick="verify()">🔓 Unlock Access</button>
+  <br>
+  <a href="/" class="back-link">← Back to RoCodesX</a>
+
+  <p class="hint">Only the site owner knows this code.<br>Hint: <strong>drith + year</strong></p>
+</div>
+
+<script>
+  function toggleEye() {
+    const inp = document.getElementById('codeInput');
+    const btn = document.getElementById('eyeBtn');
+    if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+    else { inp.type = 'password'; btn.textContent = '👁'; }
+  }
+
+  function showMsg(text, type) {
+    const el = document.getElementById('msg');
+    el.textContent = text;
+    el.className = 'msg ' + type + ' show';
+  }
+
+  async function verify() {
+    const code = document.getElementById('codeInput').value.trim();
+    if (!code) { showMsg('Please enter the owner code.', 'error'); return; }
+
+    try {
+      const res = await fetch('/verify-owner', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        showMsg('✅ ' + data.message, 'success');
+        // Store owner session and redirect after 1s
+        sessionStorage.setItem('ownerMode', 'true');
+        sessionStorage.setItem('ownerCode', code);
+        setTimeout(() => { window.location.href = '/?owner=1'; }, 1000);
+      } else {
+        showMsg('❌ Wrong code. Try again.', 'error');
+        document.getElementById('codeInput').value = '';
+        document.getElementById('codeInput').focus();
+      }
+    } catch {
+      // Fallback: check locally if server unreachable
+      if (code === 'drith2015') {
+        showMsg('✅ Owner access granted!', 'success');
+        sessionStorage.setItem('ownerMode', 'true');
+        setTimeout(() => { window.location.href = '/?owner=1'; }, 1000);
+      } else {
+        showMsg('❌ Wrong code. Try again.', 'error');
+      }
+    }
+  }
+</script>
+</body>
+</html>

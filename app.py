@@ -1,18 +1,20 @@
-from flask import Flask, send_file, request, jsonify
+from flask import Flask, send_from_directory, request, jsonify
 import os
 
 app = Flask(__name__)
 
-# ── Owner secret code ──────────────────────────────────
+# Get the directory where app.py lives
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 OWNER_CODE = "drith2015"
 
 @app.route("/")
 def home():
-    return send_file("index.html")
+    return send_from_directory(BASE_DIR, "index.html")
 
 @app.route("/unlock")
 def unlock():
-    return send_file("unlock.html")
+    return send_from_directory(BASE_DIR, "unlock.html")
 
 @app.route("/verify-owner", methods=["POST"])
 def verify_owner():

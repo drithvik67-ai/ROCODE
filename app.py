@@ -1,20 +1,17 @@
-from flask import Flask, send_from_directory, request, jsonify
+from flask import Flask, render_template, request, jsonify
 import os
 
-app = Flask(__name__)
-
-# Get the directory where app.py lives
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+app = Flask(__name__, template_folder='Templates')
 
 OWNER_CODE = "drith2015"
 
 @app.route("/")
 def home():
-    return send_from_directory(BASE_DIR, "index.html")
+    return render_template("index.html")
 
 @app.route("/unlock")
 def unlock():
-    return send_from_directory(BASE_DIR, "unlock.html")
+    return render_template("unlock.html")
 
 @app.route("/verify-owner", methods=["POST"])
 def verify_owner():
